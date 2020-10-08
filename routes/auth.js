@@ -41,28 +41,36 @@ auth.post("/login", (req, res) => {
   });
 });
 
-auth.get("/forgetPassword", (req, res) => {
+auth.post("/forgetPassword", (req, res) => {
+  console.log("body", req.body);
   db.forgetPass((err, data) => {
-    console.log(data[0].username);
     let person = data;
     if (err) throw err;
-    console.log(req.body.secretinfo);
-    console.log(bcrypt.compareSync("welcome", hash("welcome")));
     let arr = person.map(
       (element) =>
         req.body.username === element.username &&
-        bcrypt.compareSync(element.secretinfo, hash(req.body.secretinfo))
+        bcrypt.compareSync(req.body.secretinfo, element.secretinfo)
     );
-
     console.log(arr);
-    res.send(arr.includes(true));
+    if (arr.includes(true)) {
+      db.updatePass(
+        [hash(req.body.newPassword), hash(req.body.secretinfo)],
+        (err, data) => {
+          console.log("haloum");
+          if (err) throw err;
+          res.send(data);
+        }
+      );
+    } else {
+      res.send("something wrong");
+    }
   });
 });
 
 auth.post("/deleteuser", (req, res) => {
   db.deleteUser(req.body.username, (err, data) => {
     if (err) throw err;
-    res.send(req.body.username);
+    res.send(`${req.body.username} removed`);
   });
 });
 

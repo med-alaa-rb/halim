@@ -3,7 +3,6 @@ const connection = require("./connection.js");
 const getAllData = (callback) => {
   connection.query("select * from users", (err, data) => {
     if (err) throw callback(err);
-    console.log({ data });
     callback(null, data);
   });
 };
@@ -31,10 +30,7 @@ const forgetPass = (callback) => {
 };
 
 const updatePass = (arr, callback) => {
-  let sql = `UPDATE users
-  SET password = ?,
-  WHERE
-    secretinfo = ?;`;
+  let sql = `UPDATE users SET password = ?  WHERE secretinfo = ?;`;
   connection.query(sql, arr, (err, data) => {
     if (err) throw err;
     callback(null, data);
